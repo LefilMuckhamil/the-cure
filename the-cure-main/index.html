@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#060608" />
+    <title>THE CURE // lyric.system</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div id="aurora"></div>
+    <div id="grid"></div>
+    <div id="noise"></div>
+    <div id="scan"></div>
+    <div id="heart"></div>
+
+    <div id="signal">
+      <div id="dolly">
+        <div id="tilt">
+          <div id="lens"><div id="field"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="vignette"></div>
+
+    <button class="ghost-btn" id="edit">✎ LIRIK</button>
+
+    <div class="eq" aria-hidden="true">
+      <i></i><i></i><i></i><i></i><i></i><i></i>
+    </div>
+
+    <section id="console">
+      <div class="console-head">
+        <b>// EDITOR LIRIK</b>
+        <span>muncul | tahan | teks · atau: teks = 2 detik · edit permanen di lyrics.js</span>
+      </div>
+      <textarea id="script" spellcheck="false"></textarea>
+      <div class="console-actions">
+        <button id="loadAudio">Ganti audio</button>
+        <button id="styler">Rapikan</button>
+        <button id="demo">Kembalikan contoh</button>
+        <button id="close">Tutup</button>
+        <button id="apply" class="primary">Terapkan ▶</button>
+      </div>
+    </section>
+
+    <div id="endcard">
+      <small>// TRANSMISI SELESAI</small>
+      <h1>THE <em>CURE</em></h1>
+      <p>it.never("be the cure")</p>
+      <button id="again">↻ PUTAR LAGI</button>
+    </div>
+
+    <div id="toast"></div>
+
+    <audio id="audio" src="the-cure.mp3" preload="metadata"></audio>
+    <input type="file" id="audioFile" accept="audio/*" hidden />
+
+    <script src="lyrics.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
