@@ -33,15 +33,13 @@ const cue = (text, muncul, tahan) => ({
 });
 
 window.LYRICS = [
-  /* ---- BAGIAN 1: why.can ... result: "not enough" ---------------------- */
   cue(`im unraveled")`, 4.0, 2.6),
   cue(`why.can("you come stitch me up")`, 4.0, 2.6),
   cue(`why.can("it") { ever: "enough?" }`, 6.6, 2.6),
   cue(`why.can("you come stitch me up")`, 9.2, 2.6),
-  cue(`why.can("it") { ever: "enough?" }`, 11.8, 2.6),
+  cue(`why.can("it") { ever: "enoughhhhhhhhhhhhhhhhh?" }`, 11.8, 2.6),
   cue(`result: "not enough"`, 14.4, 2.6),
 
-  /* ---- BAGIAN 2: reff --------------------------------------------------- */
   cue(`oh.because("my head is full of poison")`, 17.2, 2.4),
   cue(`and.heart("is full of doubt")`, 19.6, 2.4),
   cue(`i.got("toxins in my bloodstream")`, 22.0, 2.4),
