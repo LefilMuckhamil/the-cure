@@ -33,23 +33,23 @@ const cue = (text, muncul, tahan) => ({
 });
 
 window.LYRICS = [
-  cue(`im unraveled")`, 4.0, 2.6),
-  cue(`why.can("you come stitch me up")`, 4.0, 2.6),
-  cue(`why.can("it") { ever: "enough?" }`, 6.6, 2.6),
-  cue(`why.can("you come stitch me up")`, 9.2, 2.6),
-  cue(`why.can("it") { ever: "enoughhhhhhhhhhhhhhhhh?" }`, 11.8, 2.6),
-  cue(`result: "not enough"`, 14.4, 2.6),
+  cue(`why.can("you come stitch me up")`, 4.0, 3.6),
+  cue(`why.can("it") { ever: "enough?" }`, 7.6, 2.6),
+  cue(`why.can("you come stitch me up")`, 10.2, 4.6),
+  cue(`why.can("it") { ever: "enoughhhhhhhhhhhhhhhhh?" }`, 14.8, 5.2),
+  cue(`result: "not enough"`, 23.0, 5.2),
 
-  cue(`oh.because("my head is full of poison")`, 17.2, 2.4),
-  cue(`and.heart("is full of doubt")`, 19.6, 2.4),
-  cue(`i.got("toxins in my bloodstream")`, 22.0, 2.4),
-  cue(`you.tried("so hard to suck out")`, 24.4, 2.4),
-  cue(`it.feels("like medication")`, 26.8, 2.4),
-  cue(`it.good("for me, I'm sure")`, 29.2, 2.4),
-  cue(`love.dont("matter anymore")`, 31.6, 2.4),
-  cue(`it.never("be the cure")`, 34.0, 2.4),
-  cue(`it.never("be the cure")`, 36.4, 2.4),
-  cue(`it.never("be")`, 38.8, 2.4),
+  cue(`oh.because("my head is full of poison")`, 29, 2.4),
+  cue(`and.heart("is full of doubt")`, 31.6, 2.4),
+  cue(`i.got("toxins in my bloodstream")`, 34.0, 2.4),
+  cue(`you.tried("so hard to suck out")`, 36.4, 2.4),
+  cue(`it.feels("like medication")`, 38.8, 2.4),
+  cue(`it.good("for me, I'm sure")`, 41.2, 15.8),
+
+  cue(`love.dont("matter anymore")`, 53.0, 5.6),
+  cue(`it.never("be the cure")`, 58.6, 6.8),
+  cue(`it.never("be the cure")`, 65.4, 6.7),
+  cue(`it.never("be")`, 72.1, 5.17),
 ];
 
 /* --------------------------------------------------------------------------
