@@ -34,22 +34,22 @@ const cue = (text, muncul, tahan) => ({
 
 window.LYRICS = [
   cue(`why.can("you come stitch me up")`, 4.0, 3.6),
-  cue(`why.can("it") { ever: "enough?" }`, 7.6, 2.6),
-  cue(`why.can("you come stitch me up")`, 10.2, 4.6),
-  cue(`why.can("it") { ever: "enoughhhhhhhhhhhhhhhhh?" }`, 14.8, 5.2),
-  cue(`result: "not enough"`, 23.0, 5.2),
+  cue(`why.can("it") { ever: "enough?" }`, 7.6, 2.9),
+  cue(`why.can("you come stitch me up")`, 10.5, 3.5),
+  cue(`why.can("it") { ever: "enoughhhhhhhhhhh?" }`, 14.0, 9.0),
+  cue(`result: "not enough"`, 23.0, 5.5),
 
-  cue(`oh.because("my head is full of poison")`, 29, 2.4),
-  cue(`and.heart("is full of doubt")`, 31.6, 2.4),
-  cue(`i.got("toxins in my bloodstream")`, 34.0, 2.4),
-  cue(`you.tried("so hard to suck out")`, 36.4, 2.4),
-  cue(`it.feels("like medication")`, 38.8, 2.4),
-  cue(`it.good("for me, I'm sure")`, 41.2, 15.8),
+  cue(`oh.because("my head is full of poison")`, 28.5, 4.5),
+  cue(`and.heart("is full of doubt")`, 33.0, 3.0),
+  cue(`i.got("toxins in my bloodstream")`, 36.0, 4.0),
+  cue(`you.tried("so hard to suck out")`, 40.0, 3.0),
+  cue(`it.feels("like medication")`, 43.0, 3.0),
+  cue(`it.good("for me, I'm sure")`, 46.0, 4.0),
 
-  cue(`love.dont("matter anymore")`, 53.0, 5.6),
-  cue(`it.never("be the cure")`, 58.6, 6.8),
-  cue(`it.never("be the cure")`, 65.4, 6.7),
-  cue(`it.never("be")`, 72.1, 5.17),
+  cue(`love.dont("matter anymore")`, 50.0, 5.0),
+  cue(`it.never("be the cure")`, 55.0, 8.0),
+  cue(`it.never("be the cure")`, 63.0, 7.1),
+  cue(`it.never("be")`, 70.1, 7.17),
 ];
 
 /* --------------------------------------------------------------------------
@@ -63,5 +63,3 @@ window.LYRICS = [
    Dengan nilai 40, blok kedua mulai di detik 4 + 40 = 44 (pas dengan bagian
    yang terdeteksi berulang di audio).
    -------------------------------------------------------------------------- */
-window.ULANGI_SETIAP = 40;
-window.ULANGI_MAKS = 1;
