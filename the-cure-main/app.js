@@ -39,7 +39,7 @@
   const audioFile = $("audioFile");
 
   let customCues = null; // null = pakai window.LYRICS dari lyrics.js
-  let lyrics = []; // [{ text, at, hold, end, reff }]
+  let lyrics = []; // [{ text, at, hold, end }]
   let built = [];
   let activeIndex = -1;
   let objectUrl = null;
@@ -93,22 +93,8 @@
     );
   }
 
-  function sourceCues() {
-    const base = baseCues();
-    const every = Number(window.ULANGI_SETIAP) || 0;
-    const max = every > 0 ? Math.max(0, Number(window.ULANGI_MAKS) || 0) : 0;
-
-    const out = [];
-    for (let r = 0; r <= max; r++) {
-      base.forEach((c) =>
-        out.push({ text: c.text, at: c.at + r * every, hold: c.hold }),
-      );
-    }
-    return out.sort((a, b) => a.at - b.at);
-  }
-
   function buildTimeline() {
-    const cues = sourceCues();
+    const cues = baseCues().sort((a, b) => a.at - b.at);
     const total = totalTime();
 
     return cues
@@ -120,7 +106,7 @@
         const end = next
           ? Math.min(at + hold, Math.max(at, Number(next.at) || 0))
           : at + hold;
-        return { text: c.text, at, hold, end, reff: true };
+        return { text: c.text, at, hold, end };
       })
       .filter((l) => l.at < total + 2);
   }
@@ -167,7 +153,7 @@
     field.innerHTML = "";
     built = lyrics.map((item) => {
       const el = document.createElement("div");
-      el.className = "line" + (item.reff ? " reff" : "");
+      el.className = "line reff";
       el.dataset.text = item.text;
 
       const txt = document.createElement("span");
@@ -240,7 +226,7 @@
     for (let i = 0; i < lyrics.length; i++) {
       if (t >= lyrics[i].at && t < lyrics[i].end) active = i;
     }
-    body.classList.toggle("is-reff", active >= 0 && !!lyrics[active].reff);
+    body.classList.toggle("is-reff", active >= 0);
 
     let changed = false;
     built.forEach((b, i) => {
@@ -499,7 +485,6 @@
         end: Math.round(l.end * 1000) / 1000,
       })),
     seek: seek,
-    renderAt: render,
     play: togglePlay,
     replay: replay,
     editor: toggleEditor,

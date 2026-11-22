@@ -51,15 +51,3 @@ window.LYRICS = [
   cue(`it.never("be the cure")`, 63.0, 7.1),
   cue(`it.never("be")`, 70.1, 7.17),
 ];
-
-/* --------------------------------------------------------------------------
-   PENGULANGAN
-   Lagu ini mengulang bagian yang sama. Supaya layar tidak kosong sampai lagu
-   habis, blok 15 lirik di atas diulang dengan jeda berikut.
-
-     ULANGI_SETIAP = jeda (detik) sebelum blok dimulai lagi. 0 = tidak diulang.
-     ULANGI_MAKS   = berapa kali diulang. 0 = tidak diulang.
-
-   Dengan nilai 40, blok kedua mulai di detik 4 + 40 = 44 (pas dengan bagian
-   yang terdeteksi berulang di audio).
-   -------------------------------------------------------------------------- */
