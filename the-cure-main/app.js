@@ -34,7 +34,6 @@
   const lens = $("lens");
   const consoleBox = $("console");
   const scriptBox = $("script");
-  const endcard = $("endcard");
   const toastEl = $("toast");
   const audioFile = $("audioFile");
 
@@ -44,6 +43,7 @@
   let activeIndex = -1;
   let objectUrl = null;
   let toastTimer = 0;
+  let replayTimer = 0;
 
   function toast(msg) {
     toastEl.textContent = msg;
@@ -286,15 +286,17 @@
       audio.currentTime >= totalTime() - 0.05
     ) {
       finish();
-      return;
     }
     requestAnimationFrame(tick);
   }
 
   function finish() {
+    if (replayTimer) return;
     audio.pause();
-    body.classList.add("is-ended");
-    endcard.classList.add("show");
+    replayTimer = setTimeout(() => {
+      replayTimer = 0;
+      replay();
+    }, 3000);
   }
 
   /* ======================================================================
@@ -302,7 +304,7 @@
      ====================================================================== */
   async function togglePlay() {
     if (audio.paused) {
-      if (body.classList.contains("is-ended")) restart();
+      if (audio.ended || audio.currentTime >= totalTime() - 0.05) restart();
       try {
         await audio.play();
       } catch (err) {
@@ -314,8 +316,8 @@
   }
 
   function restart() {
-    endcard.classList.remove("show");
-    body.classList.remove("is-ended");
+    clearTimeout(replayTimer);
+    replayTimer = 0;
     audio.currentTime = 0;
     render(0);
   }
@@ -330,6 +332,8 @@
   }
 
   function seek(delta) {
+    clearTimeout(replayTimer);
+    replayTimer = 0;
     const max = Math.max(0, totalTime() - 0.05);
     audio.currentTime = Math.max(0, Math.min((audio.currentTime || 0) + delta, max));
     render(audio.currentTime);
@@ -390,8 +394,7 @@
   });
 
   document.addEventListener("click", (e) => {
-    if (consoleBox.contains(e.target) || endcard.classList.contains("show"))
-      return;
+    if (consoleBox.contains(e.target)) return;
     togglePlay();
   });
 
@@ -480,11 +483,6 @@
     refreshLyrics();
     toast("Lirik dari lyrics.js dikembalikan");
   });
-  $("again").addEventListener("click", (e) => {
-    e.stopPropagation();
-    replay();
-  });
-
   /* ======================================================================
      8. API KONSOL (perintah tambahan)
      ====================================================================== */

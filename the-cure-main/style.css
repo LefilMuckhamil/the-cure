@@ -657,67 +657,7 @@ body.is-playing .eq i {
   color: #fff;
 }
 
-/* ---------- END CARD + TOAST ---------- */
-#endcard {
-  position: fixed;
-  z-index: 11;
-  inset: 0;
-  display: grid;
-  place-content: center;
-  justify-items: center;
-  gap: 14px;
-  text-align: center;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(20, 4, 10, 0.92),
-    rgba(3, 3, 5, 0.97) 70%
-  );
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 1.05s;
-  cursor: auto;
-}
-#endcard.show {
-  opacity: 1;
-  pointer-events: auto;
-}
-#endcard small {
-  font-size: 10px;
-  letter-spacing: 0.35em;
-  color: var(--dim);
-}
-#endcard h1 {
-  margin: 0;
-  font-family: var(--display);
-  font-size: clamp(38px, 11vw, 130px);
-  letter-spacing: 0.06em;
-  line-height: 0.95;
-  color: #fff;
-  text-shadow: 0 0 40px rgba(255, 43, 80, 0.55);
-}
-#endcard h1 em {
-  color: var(--red);
-  font-style: normal;
-}
-#endcard p {
-  margin: 0;
-  font-size: clamp(11px, 1.6vw, 15px);
-  color: var(--red-soft);
-  letter-spacing: 0.1em;
-}
-#again {
-  margin-top: 10px;
-  font: inherit;
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  color: #fff;
-  background: var(--red);
-  border: 0;
-  border-radius: 999px;
-  padding: 11px 22px;
-  cursor: pointer;
-}
-
+/* ---------- TOAST ---------- */
 #toast {
   position: fixed;
   z-index: 20;

@@ -18,6 +18,9 @@ Tekan Ctrl+C di jendela server untuk menghentikannya.
 Audio diputar otomatis. Kalau diblokir browser, klik halaman sekali atau
 tekan Spasi. Tambahkan ?autoplay=0 di URL kalau tidak ingin autoplay.
 
+Selesai lagu: tunggu 3 detik lalu putar ulang otomatis. Tidak ada kartu
+judul di akhir. Tekan tombol apa saja saat jeda itu untuk langsung ulang.
+
 Audio bawaan: the-cure.mp3. Bisa diganti lewat tombol LIRIK > Ganti audio.
 
 STRUKTUR FILE
