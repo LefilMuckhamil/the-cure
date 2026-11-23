@@ -135,6 +135,38 @@ body {
   z-index: 2;
 }
 
+#mood {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  background:
+    radial-gradient(ellipse at 50% 28%, rgba(44, 52, 104, 0.55), transparent 62%),
+    linear-gradient(180deg, rgba(4, 6, 20, 0.45), rgba(20, 4, 18, 0.62));
+}
+#mood::before {
+  content: "";
+  position: absolute;
+  inset: -25%;
+  background: radial-gradient(38vmin 38vmin at 30% 40%, rgba(130, 70, 120, 0.22), transparent 70%);
+  opacity: 0;
+}
+#mood::after {
+  content: "";
+  position: absolute;
+  inset: -50% 0;
+  background-image: repeating-linear-gradient(
+    100deg,
+    transparent 0 52px,
+    rgba(190, 205, 255, 0.06) 52px 53px,
+    transparent 53px 110px
+  );
+  opacity: 0;
+}
+
 #heart {
   inset: auto;
   left: 50%;
@@ -228,7 +260,7 @@ body.is-reff #tilt {
   position: relative;
   min-height: 1.7em;
   margin: 0.28em 0;
-  font-size: clamp(13px, 1.75vw, 21px);
+  font-size: clamp(14px, 1.9vw, 23px);
   line-height: 1.6;
   white-space: pre-wrap;
   word-break: break-word;
@@ -338,7 +370,7 @@ body.is-reff #tilt {
 /* ---------- REFF: tipografi besar + glitch ---------- */
 .line.reff {
   font-family: var(--display);
-  font-size: clamp(18px, 2.75vw, 36px);
+  font-size: clamp(20px, 3.05vw, 40px);
   font-weight: 900;
   letter-spacing: -0.02em;
   line-height: 1.28;
@@ -412,6 +444,70 @@ body.is-reff #tilt {
   }
   93% {
     opacity: 0;
+  }
+}
+
+/* ---------- SUASANA SEDIH ----------
+   Hanya mengubah latar. Tipografi lirik tidak disentuh.
+   ----------------------------------- */
+
+body[data-mood="sad"] #mood {
+  opacity: 1;
+}
+body[data-mood="sad"] #mood::before {
+  opacity: 1;
+  animation: moodDrift 11s ease-in-out infinite alternate;
+}
+body[data-mood="sad"] #mood::after {
+  opacity: 1;
+  animation: tearFall 8s linear infinite;
+}
+
+body[data-mood="sad"] #aurora {
+  animation: sadAurora 10s ease-in-out infinite alternate;
+}
+body[data-mood="sad"] #grid {
+  opacity: 0.16;
+}
+body[data-mood="sad"] #scan {
+  opacity: 0.72;
+}
+body[data-mood="sad"] #noise {
+  opacity: 0.11;
+}
+body[data-mood="sad"] #heart {
+  width: min(88vmin, 900px);
+  border-color: rgba(180, 130, 190, 0.65);
+  box-shadow: 0 0 70px rgba(120, 80, 170, 0.22);
+}
+body[data-mood="sad"].is-reff #heart {
+  animation-duration: 2.4s;
+}
+
+@keyframes moodDrift {
+  from {
+    transform: translate3d(-3%, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(4%, -2%, 0) scale(1.12);
+  }
+}
+@keyframes tearFall {
+  from {
+    transform: translateY(-30%);
+  }
+  to {
+    transform: translateY(30%);
+  }
+}
+@keyframes sadAurora {
+  from {
+    transform: scale(1) translate3d(-2%, 1%, 0);
+    filter: saturate(0.7);
+  }
+  to {
+    transform: scale(1.16) translate3d(2%, -3%, 0);
+    filter: saturate(1.15);
   }
 }
 
@@ -669,7 +765,10 @@ body.is-playing .eq i {
   .line.reff.is-active,
   body.is-reff #heart,
   .ch.on,
-  body.is-playing .eq i {
+  body.is-playing .eq i,
+  body[data-mood="sad"] #aurora,
+  body[data-mood="sad"] #mood::before,
+  body[data-mood="sad"] #mood::after {
     animation: none !important;
   }
   .ch.on {

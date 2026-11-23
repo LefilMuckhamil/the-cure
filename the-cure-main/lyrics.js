@@ -5,11 +5,12 @@
 
    Setiap baris ditulis begini:
 
-       cue( teks, muncul, tahan )
+       cue( teks, muncul, tahan, suasana )
 
      • teks    = lirik (pakai tanda backtick ` karena ada tanda kutip " di dalam)
      • muncul  = detik dari awal lagu saat lirik ini mulai muncul
      • tahan   = berapa detik lirik ini nampak sebelum berganti
+     • suasana = optional: sad (mengubah latar, bukan tipografi)
 
    CONTOH:
        cue(`why.can("you come stitch me up")`, 4.0, 2.6)
@@ -26,10 +27,11 @@
      30-58 dtk bagian paling padat
    ========================================================================== */
 
-const cue = (text, muncul, tahan) => ({
+const cue = (text, muncul, tahan, mood = "") => ({
   text: text,
   at: Number(muncul) || 0,
   hold: Math.max(0.2, Number(tahan) || 2.5),
+  mood: mood,
 });
 
 window.LYRICS = [
@@ -39,12 +41,12 @@ window.LYRICS = [
   cue(`why.can("it") { ever: "enoughhhhhhhhhhh?" }`, 14.0, 9.0),
   cue(`result: "not enough"`, 23.0, 5.5),
 
-  cue(`oh.because("my head is full of poison")`, 28.5, 4.5),
-  cue(`and.heart("is full of doubt")`, 33.0, 3.0),
-  cue(`i.got("toxins in my bloodstream")`, 36.0, 4.0),
-  cue(`you.tried("so hard to suck out")`, 40.0, 3.0),
-  cue(`it.feels("like medication")`, 43.0, 3.0),
-  cue(`it.good("for me, I'm sure")`, 46.0, 4.0),
+  cue(`oh.because("my head is full of poison")`, 28.5, 4.5, "sad"),
+  cue(`and.heart("is full of doubt")`, 33.0, 3.0, "sad"),
+  cue(`i.got("toxins in my bloodstream")`, 36.0, 4.0, "sad"),
+  cue(`you.tried("so hard to suck out")`, 40.0, 3.0, "sad"),
+  cue(`it.feels("like medication")`, 43.0, 3.0, "sad"),
+  cue(`it.good("for me, I'm sure")`, 46.0, 4.0, "sad"),
 
   cue(`love.dont("matter anymore")`, 50.0, 5.0),
   cue(`it.never("be the cure")`, 55.0, 8.0),

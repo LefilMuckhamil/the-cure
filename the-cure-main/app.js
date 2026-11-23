@@ -67,7 +67,10 @@
         if (typeof row === "string") {
           return { text: row, at: 0, hold: DEFAULT_HOLD };
         }
-        const text = String(row.text || row.teks || "");
+        const rawText = String(row.text || row.teks || "");
+        const match = rawText.match(/^\[([\w-]+)\]\s*([\s\S]*)$/);
+        const mood = match ? match[1] : row.mood || "";
+        const text = match ? match[2] : rawText;
         if (!text) return null;
         const at = Number(
           row.at !== undefined ? row.at : row.muncul !== undefined ? row.muncul : 0,
@@ -81,7 +84,7 @@
                 ? row.detik
                 : DEFAULT_HOLD,
         );
-        return { text, at: isFinite(at) ? Math.max(0, at) : 0, hold };
+        return { text, at: isFinite(at) ? Math.max(0, at) : 0, hold, mood };
       })
       .filter(Boolean)
       .filter((r) => r.text.trim());
@@ -106,7 +109,7 @@
         const end = next
           ? Math.min(at + hold, Math.max(at, Number(next.at) || 0))
           : at + hold;
-        return { text: c.text, at, hold, end };
+        return { text: c.text, at, hold, end, mood: c.mood };
       })
       .filter((l) => l.at < total + 2);
   }
@@ -227,6 +230,12 @@
       if (t >= lyrics[i].at && t < lyrics[i].end) active = i;
     }
     body.classList.toggle("is-reff", active >= 0);
+    const activeMood = active >= 0 ? lyrics[active].mood || "" : "";
+    if (activeMood) {
+      if (body.dataset.mood !== activeMood) body.dataset.mood = activeMood;
+    } else if (body.hasAttribute("data-mood")) {
+      body.removeAttribute("data-mood");
+    }
 
     let changed = false;
     built.forEach((b, i) => {
@@ -395,7 +404,10 @@
 
   function serialize() {
     return baseCues()
-      .map((c) => `${fmt(c.at)} | ${fmt(c.hold)} | ${c.text}`)
+      .map(
+        (c) =>
+          `${fmt(c.at)} | ${fmt(c.hold)} | ${c.mood ? "[" + c.mood + "] " : ""}${c.text}`,
+      )
       .join("\n");
   }
 
@@ -483,6 +495,7 @@
         at: l.at,
         hold: l.hold,
         end: Math.round(l.end * 1000) / 1000,
+        mood: l.mood,
       })),
     seek: seek,
     play: togglePlay,

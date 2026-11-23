@@ -36,10 +36,11 @@ MENGATUR WAKTU LIRIK
 
 Edit lyrics.js. Tiap baris berbentuk:
 
-    cue(`teks lirik`, muncul, tahan)
+    cue(`teks lirik`, muncul, tahan, suasana)
 
-  muncul = detik dari awal audio saat teks mulai tampil
-  tahan  = lama teks tampil, dalam detik
+  muncul   = detik dari awal audio saat teks mulai tampil
+  tahan    = lama teks tampil, dalam detik
+  suasana  = optional: "sad" mengubah latar saat lirik itu aktif
 
 Contoh:
 
@@ -54,6 +55,15 @@ Penyesuaian yang sering dipakai:
 
 Pakai tanda backtick (`) untuk teks, bukan tanda kutip, karena dalam
 teks ada tanda kutip ganda.
+
+SUASANA LATAR
+-------------
+
+Efek "sad" hanya mengubah latar (warna, grid, garis hujan, denyut
+lingkaran), tidak mengubah bentuk teks lirik. Berlaku selama baris
+bersangkutan tampil. Di editor ditulis sebagai prefix:
+
+    [sad] oh.because("my head is full of poison")
 
 KONTROL
 -------
