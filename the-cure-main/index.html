@@ -14,20 +14,42 @@
   <body>
     <div id="aurora"></div>
     <div id="grid"></div>
+    <canvas id="viz"></canvas>
     <div id="noise"></div>
     <div id="scan"></div>
     <div id="heart"></div>
 
     <div id="signal">
-      <div id="dolly">
-        <div id="tilt">
-          <div id="lens"><div id="field"></div></div>
+      <div id="camera">
+        <div id="dolly">
+          <div id="tilt">
+            <div id="lens"><div id="field"></div></div>
+          </div>
         </div>
       </div>
     </div>
 
     <div id="vignette"></div>
     <div id="mood"></div>
+
+    <div id="hud" aria-hidden="true">
+      <div class="hud-top">
+        <span class="hud-dot"></span>
+        <span>THE CURE // LYRIC.SYSTEM</span>
+        <span class="hud-mode" id="hudMode">SIGNAL</span>
+      </div>
+      <div class="hud-bottom">
+        <span id="hudTime">00:00</span>
+        <div class="hud-track"><div id="hudFill"></div></div>
+        <span id="hudTotal">01:17</span>
+      </div>
+    </div>
+
+    <div id="intro" aria-hidden="true">
+      <div class="intro-word">THE</div>
+      <div class="intro-word">CURE</div>
+      <div class="intro-sub">LYRIC.SYSTEM // 77.27</div>
+    </div>
 
     <button class="ghost-btn" id="edit">✎ LIRIK</button>
 

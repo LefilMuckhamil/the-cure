@@ -68,6 +68,17 @@ bersangkutan tampil. Di editor ditulis sebagai prefix:
 
     [sad] oh.because("my head is full of poison")
 
+ANIMASI GRAFIS
+--------------
+
+Selain tipografi, tampilan memakai Web Audio API untuk mengubah suara jadi
+visual: partikel, spectrum melingkar, waveform, dan riak mengikuti beat.
+Kamera 3D (dolly + goyangan halus) dan pergerakan lirik di-smooth supaya
+transisi antar baris terasa sinematik. Saat mood "sad", palet visual
+berubah ke ungu/biru.
+
+Semua efek otomatis melemah bila sistem memakai prefers-reduced-motion.
+
 KONTROL
 -------
 
@@ -87,6 +98,8 @@ Perintah di Console browser (F12):
   TheCure.replay()       ulang dari awal
   TheCure.editor()       buka editor
   TheCure.reset()        kembali ke lirik dari lyrics.js
+  TheCure.viz()          lihat energi, bass, beat, dan estimasi BPM
+  TheCure.renderAt(20)   paksa tampil lirik di detik 20 (tanpa audio)
 
 EDITOR LIRIK
 ------------

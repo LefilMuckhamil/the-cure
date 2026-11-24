@@ -32,10 +32,25 @@
   const audio = $("audio");
   const field = $("field");
   const lens = $("lens");
+  const camera = $("camera");
+  const canvas = $("viz");
+  const ctx = canvas && canvas.getContext ? canvas.getContext("2d") : null;
   const consoleBox = $("console");
   const scriptBox = $("script");
   const toastEl = $("toast");
   const audioFile = $("audioFile");
+  const hudTime = $("hudTime");
+  const hudTotal = $("hudTotal");
+  const hudFill = $("hudFill");
+  const hudMode = $("hudMode");
+  const motionQuery =
+    window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)");
+  let reduceMotion = !!(motionQuery && motionQuery.matches);
+  if (motionQuery && motionQuery.addEventListener) {
+    motionQuery.addEventListener("change", (e) => {
+      reduceMotion = e.matches;
+    });
+  }
 
   let customCues = null; // null = pakai window.LYRICS dari lyrics.js
   let lyrics = []; // [{ text, at, hold, end }]
@@ -44,6 +59,34 @@
   let objectUrl = null;
   let toastTimer = 0;
   let replayTimer = 0;
+
+  // -- analisis audio --
+  let audioCtx = null;
+  let analyser = null;
+  let freqData = null;
+  let timeData = null;
+  let energy = 0;
+  let bass = 0;
+  let treble = 0;
+  let beat = 0;
+  let lastBeat = 0;
+  let bpmEstimate = 0;
+  const beatHistory = [];
+
+  // -- panggung canvas --
+  let particles = [];
+  let ripples = [];
+  let lastFrame = performance.now();
+
+  // -- target kamera & lens yang di-smooth --
+  let camX = 0,
+    camY = 0,
+    camTargetX = 0,
+    camTargetY = 0;
+  let lensX = 0,
+    lensY = 0,
+    lensTargetX = 0,
+    lensTargetY = 0;
 
   function toast(msg) {
     toastEl.textContent = msg;
@@ -56,6 +99,257 @@
     return isFinite(audio.duration) && audio.duration > 0
       ? audio.duration
       : FALLBACK_DURATION;
+  }
+
+  /* ======================================================================
+     2b. AUDIO REAKTIF — Web Audio API + panggung canvas
+     ====================================================================== */
+  function initAudioGraph() {
+    if (audioCtx) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    try {
+      audioCtx = new AC();
+      const src = audioCtx.createMediaElementSource(audio);
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 2048;
+      analyser.smoothingTimeConstant = 0.78;
+      src.connect(analyser);
+      analyser.connect(audioCtx.destination);
+      freqData = new Uint8Array(analyser.frequencyBinCount);
+      timeData = new Uint8Array(analyser.fftSize);
+    } catch (err) {
+      analyser = null;
+    }
+  }
+
+  function resumeAudio() {
+    initAudioGraph();
+    if (audioCtx && audioCtx.state === "suspended") {
+      audioCtx.resume().catch(() => {});
+    }
+  }
+
+  function fmtTime(s) {
+    s = Math.max(0, Math.floor(Number(s) || 0));
+    return (
+      String(Math.floor(s / 60)).padStart(2, "0") +
+      ":" +
+      String(s % 60).padStart(2, "0")
+    );
+  }
+
+  function updateHud(t) {
+    const total = totalTime();
+    hudFill.style.width = (Math.min(1, t / total) * 100).toFixed(2) + "%";
+    hudTime.textContent = fmtTime(t);
+    hudTotal.textContent = fmtTime(total);
+    hudMode.textContent =
+      body.dataset.mood === "sad"
+        ? "SAD // SIGNAL"
+        : body.classList.contains("is-reff")
+          ? "REFF // LOCK"
+          : "SIGNAL";
+  }
+
+  function lerp(a, b, t) {
+    return a + (b - a) * t;
+  }
+
+  function analyse(now, dt) {
+    const playing = analyser && freqData && !audio.paused && !audio.ended;
+    if (playing) {
+      analyser.getByteFrequencyData(freqData);
+      analyser.getByteTimeDomainData(timeData);
+
+      const n = freqData.length;
+      const loEnd = Math.floor(n * 0.08);
+      const midEnd = Math.floor(n * 0.35);
+      let lo = 0;
+      let mid = 0;
+      let hi = 0;
+      for (let i = 0; i < n; i++) {
+        const v = freqData[i] / 255;
+        if (i < loEnd) lo += v;
+        else if (i < midEnd) mid += v;
+        else hi += v;
+      }
+      lo /= Math.max(1, loEnd);
+      mid /= Math.max(1, midEnd - loEnd);
+      hi /= Math.max(1, n - midEnd);
+
+      energy = energy * 0.82 + (lo * 0.5 + mid * 0.32 + hi * 0.18) * 0.18;
+      bass = bass * 0.78 + lo * 0.22;
+      treble = treble * 0.85 + hi * 0.15;
+
+      const instant = lo * 0.72 + mid * 0.28;
+      beatHistory.push(instant);
+      if (beatHistory.length > 43) beatHistory.shift();
+      const avg = beatHistory.reduce((a, b) => a + b, 0) / beatHistory.length;
+      if (instant > avg * 1.28 && instant > 0.14 && now - lastBeat > 280) {
+        if (lastBeat && now - lastBeat < 1400) {
+          bpmEstimate = Math.round(60000 / (now - lastBeat));
+        }
+        lastBeat = now;
+        beat = 1;
+        if (!reduceMotion) ripples.push({ r: 0, a: 1 });
+      }
+    } else {
+      energy *= 0.96;
+      bass *= 0.96;
+      treble *= 0.96;
+    }
+    beat = Math.max(0, beat - dt * 0.0038);
+    const root = document.documentElement.style;
+    root.setProperty("--energy", energy.toFixed(3));
+    root.setProperty("--beat", beat.toFixed(3));
+  }
+
+  function resizeCanvas() {
+    if (!ctx) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.max(1, Math.floor(innerWidth * dpr));
+    canvas.height = Math.max(1, Math.floor(innerHeight * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const count = reduceMotion
+      ? 24
+      : Math.min(110, Math.floor((innerWidth * innerHeight) / 15000));
+    particles = Array.from({ length: Math.max(20, count) }, () => ({
+      x: Math.random() * innerWidth,
+      y: Math.random() * innerHeight,
+      vx: (Math.random() - 0.5) * 0.28,
+      vy: -0.12 - Math.random() * 0.5,
+      size: 0.6 + Math.random() * 2.1,
+      phase: Math.random() * Math.PI * 2,
+      tone: Math.floor(Math.random() * 3),
+    }));
+  }
+
+  function drawViz(now, dt) {
+    if (!ctx) return;
+    const w = innerWidth;
+    const h = innerHeight;
+    const sad = body.dataset.mood === "sad";
+    const palette = sad
+      ? ["150, 123, 255", "120, 233, 255", "255, 107, 157"]
+      : ["255, 43, 80", "198, 255, 74", "120, 233, 255"];
+
+    ctx.clearRect(0, 0, w, h);
+    ctx.globalCompositeOperation = "lighter";
+
+    if (freqData && !audio.paused) {
+      const cx = w * 0.5;
+      const cy = h * 0.46;
+      const radius = Math.min(w, h) * 0.24 * (1 + beat * 0.035);
+      const bars = 96;
+      ctx.lineWidth = 1.4;
+      for (let i = 0; i < bars; i++) {
+        const bin = Math.floor((i / bars) * freqData.length * 0.5);
+        const v = freqData[bin] / 255;
+        if (v < 0.06) continue;
+        const a = (i / bars) * Math.PI * 2 + now * 0.00007;
+        const len = 6 + v * Math.min(w, h) * 0.15;
+        const x1 = cx + Math.cos(a) * radius;
+        const y1 = cy + Math.sin(a) * radius;
+        ctx.strokeStyle =
+          "rgba(" + palette[i % 3] + "," + (0.1 + v * 0.55).toFixed(3) + ")";
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(
+          cx + Math.cos(a) * (radius + len),
+          cy + Math.sin(a) * (radius + len),
+        );
+        ctx.stroke();
+      }
+    }
+
+    for (let i = ripples.length - 1; i >= 0; i--) {
+      const rp = ripples[i];
+      rp.r += dt * (0.32 + energy * 0.5);
+      rp.a -= dt * 0.0011;
+      if (rp.a <= 0) {
+        ripples.splice(i, 1);
+        continue;
+      }
+      ctx.beginPath();
+      ctx.arc(w / 2, h * 0.46, rp.r, 0, Math.PI * 2);
+      ctx.strokeStyle =
+        "rgba(" + palette[0] + "," + (rp.a * 0.28).toFixed(3) + ")";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    const speed = 1 + energy * 3.5 + beat * 1.5;
+    for (const p of particles) {
+      p.x += (p.vx + Math.sin(now * 0.0004 + p.phase) * 0.16) * speed;
+      p.y += p.vy * speed;
+      if (p.y < -20) {
+        p.y = h + 20;
+        p.x = Math.random() * w;
+      }
+      if (p.x < -20) p.x = w + 20;
+      if (p.x > w + 20) p.x = -20;
+      const r = p.size * (1 + bass * 1.5 + beat * 0.6);
+      ctx.fillStyle =
+        "rgba(" + palette[p.tone] + "," + (0.12 + energy * 0.5).toFixed(3) + ")";
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    if (timeData && !audio.paused) {
+      ctx.beginPath();
+      for (let i = 0; i < timeData.length; i += 4) {
+        const x = (i / (timeData.length - 1)) * w;
+        const y =
+          h * 0.5 +
+          ((timeData[i] - 128) / 128) * h * (0.035 + energy * 0.05);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle =
+        "rgba(" + palette[1] + "," + (0.1 + treble * 0.35).toFixed(3) + ")";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    ctx.globalCompositeOperation = "source-over";
+  }
+
+  function updateCamera(now, dt) {
+    if (reduceMotion) return;
+    const t = 1 - Math.exp(-dt / 170);
+    camTargetX =
+      Math.sin(now * 0.00021) * 9 + (Math.random() - 0.5) * beat * 16;
+    camTargetY = Math.cos(now * 0.00017) * 6 + beat * 8;
+    camX = lerp(camX, camTargetX, t);
+    camY = lerp(camY, camTargetY, t);
+    const z = beat * 34 + bass * 20;
+    const rz = Math.sin(now * 0.00013) * 0.5 + beat * 0.22;
+    camera.style.transform =
+      "translate3d(" +
+      camX.toFixed(2) +
+      "px," +
+      camY.toFixed(2) +
+      "px," +
+      z.toFixed(1) +
+      "px) rotateZ(" +
+      rz.toFixed(3) +
+      "deg) scale(" +
+      (1 + beat * 0.012).toFixed(4) +
+      ")";
+  }
+
+  function updateLens(dt) {
+    const t = 1 - Math.exp(-dt / (reduceMotion ? 1 : 300));
+    lensX = lerp(lensX, lensTargetX, t);
+    lensY = lerp(lensY, lensTargetY, t);
+    lens.style.transform =
+      "translate(calc(-50% + " +
+      lensX.toFixed(1) +
+      "px), " +
+      lensY.toFixed(1) +
+      "px)";
   }
 
   /* ======================================================================
@@ -204,24 +498,18 @@
   /* ======================================================================
      5. KAMERA & RENDER
      ====================================================================== */
-  function follow(el, panning) {
+  function follow(el) {
     const cur = el.querySelector(".cur");
     const y =
       el.offsetTop +
       (cur && cur.offsetParent
         ? cur.offsetTop + cur.offsetHeight / 2
         : el.offsetHeight / 2);
-    const x =
+    lensTargetX =
       cur && cur.offsetParent
         ? -(cur.offsetLeft - lens.clientWidth * 0.5) * 0.22
         : 0;
-    lens.classList.toggle("panning", !!panning);
-    lens.style.transform =
-      "translate(calc(-50% + " +
-      x.toFixed(1) +
-      "px), " +
-      (-(y + el.offsetHeight / 2)).toFixed(1) +
-      "px)";
+    lensTargetY = -(y + el.offsetHeight / 2);
   }
 
   function render(t) {
@@ -272,14 +560,32 @@
 
     if (active !== activeIndex) {
       activeIndex = active;
-      if (active >= 0) follow(built[active].el, false);
+      if (active >= 0) follow(built[active].el);
     } else if (changed && active >= 0) {
-      follow(built[active].el, true);
+      follow(built[active].el);
     }
   }
 
-  function tick() {
-    render(audio.currentTime || 0);
+  function tick(now) {
+    if (!now) now = performance.now();
+    const dt = Math.min(64, Math.max(0, now - lastFrame));
+    lastFrame = now;
+    const t = audio.currentTime || 0;
+
+    analyse(now, dt);
+    render(t);
+    updateCamera(now, dt);
+    updateLens(dt);
+    drawViz(now, dt);
+    updateHud(t);
+
+    if (
+      !body.classList.contains("intro-done") &&
+      t > 0.8 &&
+      !audio.paused
+    ) {
+      body.classList.add("intro-done");
+    }
     if (
       !audio.paused &&
       !audio.ended &&
@@ -304,6 +610,7 @@
      ====================================================================== */
   async function togglePlay() {
     if (audio.paused) {
+      resumeAudio();
       if (audio.ended || audio.currentTime >= totalTime() - 0.05) restart();
       try {
         await audio.play();
@@ -323,6 +630,7 @@
   }
 
   async function replay() {
+    resumeAudio();
     restart();
     try {
       await audio.play();
@@ -347,7 +655,10 @@
     }
   }
 
-  audio.addEventListener("play", () => body.classList.add("is-playing"));
+  audio.addEventListener("play", () => {
+    body.classList.add("is-playing");
+    resumeAudio();
+  });
   audio.addEventListener("pause", () => body.classList.remove("is-playing"));
   audio.addEventListener("ended", finish);
   audio.addEventListener("loadedmetadata", refreshLyrics);
@@ -360,6 +671,7 @@
     audio.src = objectUrl;
     audio.load();
     restart();
+    resumeAudio();
     audio
       .play()
       .then(() => toast("Audio: " + f.name))
@@ -367,6 +679,7 @@
   });
 
   document.addEventListener("keydown", (e) => {
+    resumeAudio();
     if (e.target === scriptBox) {
       if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
         e.preventDefault();
@@ -395,8 +708,11 @@
 
   document.addEventListener("click", (e) => {
     if (consoleBox.contains(e.target)) return;
+    resumeAudio();
     togglePlay();
   });
+
+  window.addEventListener("resize", resizeCanvas);
 
   /* ======================================================================
      7. EDITOR LIRIK
@@ -499,6 +815,13 @@
     play: togglePlay,
     replay: replay,
     editor: toggleEditor,
+    renderAt: (t) => render(Number(t) || 0),
+    viz: () => ({
+      energy: Math.round(energy * 1000) / 1000,
+      bass: Math.round(bass * 1000) / 1000,
+      beat: Math.round(beat * 1000) / 1000,
+      bpm: bpmEstimate,
+    }),
     reset: () => {
       customCues = null;
       refreshLyrics();
@@ -509,12 +832,14 @@
   /* ======================================================================
      9. MULAI — langsung jalan begitu halaman dibuka dari server
      ====================================================================== */
+  resizeCanvas();
   refreshLyrics();
   requestAnimationFrame(tick);
 
   // Coba autoplay. Kalau browser melarang, cukup ketuk layar / Space.
   // Tambahkan ?autoplay=0 di URL kalau tidak ingin langsung diputar.
   if (new URLSearchParams(location.search).get("autoplay") !== "0") {
+    initAudioGraph();
     audio.play().catch(() => {});
   }
 })();
