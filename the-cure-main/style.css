@@ -1,7 +1,10 @@
-/* ============================================================
-         THE CURE â€” LYRIC.SYSTEM
-         Background & gaya tipografi dipertahankan.
-         ============================================================ */
+/* ==========================================================================
+   THE CURE — SISTEM VISUAL
+   Latar -> panggung 3D -> tipografi -> mood -> kontrol
+   ========================================================================== */
+
+/* --------------------------------------------------------------------- 1 */
+/* Token & reset                                                            */
 :root {
   --bg: #060608;
   --fg: #ece8e2;
@@ -14,17 +17,15 @@
   --line: rgba(255, 255, 255, 0.09);
   --energy: 0;
   --beat: 0;
-  --mono:
-    "JetBrains Mono", "Fira Code", "SFMono-Regular", Consolas,
+  --mono: "JetBrains Mono", "Fira Code", "SFMono-Regular", Consolas,
     "Liberation Mono", monospace;
   --display: "Arial Black", "Helvetica Neue", Impact, sans-serif;
-  box-sizing: border-box;
   --safe-t: env(safe-area-inset-top, 0px);
   --safe-b: env(safe-area-inset-bottom, 0px);
 }
 
 * {
-  box-sizing: inherit;
+  box-sizing: border-box;
 }
 
 html,
@@ -42,7 +43,8 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* ---------- LATAR: aurora, grid, noise, scanline ---------- */
+/* --------------------------------------------------------------------- 2 */
+/* Latar                                                                    */
 #aurora,
 #grid,
 #viz,
@@ -60,45 +62,12 @@ body {
   z-index: 0;
 }
 
-#viz {
-  z-index: 1;
-  width: 100%;
-  height: 100%;
-  mix-blend-mode: screen;
-  opacity: calc(0.72 + var(--energy) * 0.28);
-}
-body[data-mood="sad"] #viz {
-  opacity: calc(0.5 + var(--energy) * 0.25);
-}
-
 #aurora {
   background:
-    radial-gradient(
-      60vmin 60vmin at 18% 22%,
-      rgba(255, 43, 80, 0.16),
-      transparent 70%
-    ),
-    radial-gradient(
-      55vmin 55vmin at 82% 78%,
-      rgba(120, 233, 255, 0.08),
-      transparent 70%
-    ),
-    radial-gradient(
-      70vmin 70vmin at 50% 120%,
-      rgba(198, 255, 74, 0.05),
-      transparent 70%
-    );
+    radial-gradient(60vmin 60vmin at 18% 22%, rgba(255, 43, 80, 0.16), transparent 70%),
+    radial-gradient(55vmin 55vmin at 82% 78%, rgba(120, 233, 255, 0.08), transparent 70%),
+    radial-gradient(70vmin 70vmin at 50% 120%, rgba(198, 255, 74, 0.05), transparent 70%);
   animation: breathe 9s ease-in-out infinite alternate;
-}
-@keyframes breathe {
-  from {
-    transform: scale(1) translate3d(0, 0, 0);
-    filter: saturate(1);
-  }
-  to {
-    transform: scale(1.12) translate3d(2%, -2%, 0);
-    filter: saturate(1.5);
-  }
 }
 
 #grid {
@@ -108,35 +77,27 @@ body[data-mood="sad"] #viz {
   background-size: 64px 64px;
   opacity: 0.5;
   mask-image: radial-gradient(ellipse at center, #000 20%, transparent 78%);
-  -webkit-mask-image: radial-gradient(
-    ellipse at center,
-    #000 20%,
-    transparent 78%
-  );
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 20%, transparent 78%);
+}
+
+#viz {
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  mix-blend-mode: screen;
+  opacity: calc(0.72 + var(--energy) * 0.28);
 }
 
 #noise {
+  z-index: 2;
   opacity: 0.07;
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   animation: grain 0.5s steps(3) infinite;
 }
-@keyframes grain {
-  0% {
-    background-position: 0 0;
-  }
-  33% {
-    background-position: -40px 25px;
-  }
-  66% {
-    background-position: 30px -35px;
-  }
-  100% {
-    background-position: 0 0;
-  }
-}
 
 #scan {
+  z-index: 2;
   background: repeating-linear-gradient(
     to bottom,
     transparent 0 3px,
@@ -146,12 +107,12 @@ body[data-mood="sad"] #viz {
 }
 
 #vignette {
+  z-index: 2;
   background: radial-gradient(
     ellipse at center,
     transparent 32%,
     rgba(0, 0, 0, 0.9) 100%
   );
-  z-index: 2;
 }
 
 #mood {
@@ -170,7 +131,11 @@ body[data-mood="sad"] #viz {
   content: "";
   position: absolute;
   inset: -25%;
-  background: radial-gradient(38vmin 38vmin at 30% 40%, rgba(130, 70, 120, 0.22), transparent 70%);
+  background: radial-gradient(
+    38vmin 38vmin at 30% 40%,
+    rgba(130, 70, 120, 0.22),
+    transparent 70%
+  );
   opacity: 0;
 }
 #mood::after {
@@ -190,41 +155,29 @@ body[data-mood="sad"] #viz {
   inset: auto;
   left: 50%;
   top: 50%;
+  z-index: 1;
   width: min(72vmin, 760px);
   aspect-ratio: 1;
   border: 1px solid var(--red);
   border-radius: 50%;
   opacity: 0;
   transform: translate(-50%, -50%);
-  z-index: 1;
 }
 body.is-reff #heart {
   animation: heartbeat 1.15s ease-out infinite;
 }
-@keyframes heartbeat {
-  0% {
-    transform: translate(-50%, -50%) scale(0.5);
-    opacity: 0.55;
-  }
-  38% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.14;
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(1.28);
-    opacity: 0;
-  }
-}
 
-/* ---------- PANGgung 3D ---------- */
+/* --------------------------------------------------------------------- 3 */
+/* Panggung 3D                                                              */
 #signal {
   position: fixed;
   inset: 0;
+  z-index: 3;
+  overflow: hidden;
   perspective: 1000px;
   perspective-origin: 50% 44%;
-  overflow: hidden;
-  z-index: 3;
 }
+
 #camera,
 #dolly,
 #tilt {
@@ -235,33 +188,12 @@ body.is-reff #heart {
 #camera {
   will-change: transform;
 }
-#dolly,
-#tilt {
-  position: absolute;
-  inset: 0;
-  transform-style: preserve-3d;
-}
+
 #dolly {
   animation: dolly 11s ease-in-out infinite alternate;
 }
-@keyframes dolly {
-  from {
-    transform: translateZ(-170px);
-  }
-  to {
-    transform: translateZ(150px);
-  }
-}
 #tilt {
   animation: sway 14s ease-in-out infinite alternate;
-}
-@keyframes sway {
-  from {
-    transform: rotateX(5deg) rotateY(-12deg) rotateZ(-1deg);
-  }
-  to {
-    transform: rotateX(9deg) rotateY(-3deg) rotateZ(1deg);
-  }
 }
 body.is-reff #tilt {
   animation-duration: 8s;
@@ -272,9 +204,8 @@ body.is-reff #tilt {
   top: 50%;
   left: 50%;
   width: min(88vw, 1000px);
-  transform-origin: 50% 0;
   transform: translate(-50%, 0);
-  transition: none;
+  transform-origin: 50% 0;
   will-change: transform;
 }
 
@@ -283,7 +214,8 @@ body.is-reff #tilt {
   transform-style: preserve-3d;
 }
 
-/* ---------- TIPOGRAFI ---------- */
+/* --------------------------------------------------------------------- 4 */
+/* Tipografi                                                                */
 .line {
   position: relative;
   min-height: 1.7em;
@@ -295,11 +227,11 @@ body.is-reff #tilt {
   opacity: 0;
   filter: blur(3px);
   transform: translateZ(80px) scale(1.02);
+  transform-style: preserve-3d;
   transition:
     opacity 0.7s ease,
     filter 0.7s ease,
     transform 0.95s cubic-bezier(0.22, 0.75, 0.2, 1);
-  transform-style: preserve-3d;
   will-change: transform, opacity, filter;
 }
 .line.is-future {
@@ -327,7 +259,6 @@ body.is-reff #tilt {
 .sp {
   display: inline;
 }
-
 .ch {
   display: none;
   opacity: 0;
@@ -337,26 +268,8 @@ body.is-reff #tilt {
   display: inline-block;
   animation: charLand 0.46s cubic-bezier(0.18, 0.9, 0.28, 1.25) both;
 }
-@keyframes charLand {
-  0% {
-    opacity: 0;
-    transform: translateY(0.62em) rotateX(-78deg) scale(1.35);
-    filter: blur(8px);
-  }
-  55% {
-    opacity: 1;
-    filter: blur(0);
-  }
-  100% {
-    opacity: 1;
-    transform: none;
-    filter: none;
-  }
-}
 
-.c-plain {
-  color: var(--fg);
-}
+.c-plain { color: var(--fg); }
 .c-str {
   color: var(--acid);
   text-shadow: 0 0 14px rgba(198, 255, 74, 0.25);
@@ -366,21 +279,11 @@ body.is-reff #tilt {
   color: #5d5b66;
   font-style: italic;
 }
-.c-fn {
-  color: var(--cyan);
-}
-.c-key {
-  color: var(--gold);
-}
-.c-kw {
-  color: var(--red-soft);
-}
-.c-br {
-  color: #8b8894;
-}
-.c-num {
-  color: #ffa8c0;
-}
+.c-fn { color: var(--cyan); }
+.c-key { color: var(--gold); }
+.c-kw { color: var(--red-soft); }
+.c-br { color: #8b8894; }
+.c-num { color: #ffa8c0; }
 
 .cur {
   display: inline-block;
@@ -389,18 +292,11 @@ body.is-reff #tilt {
   margin-left: 3px;
   background: var(--red);
   vertical-align: -0.15em;
-  box-shadow:
-    0 0 16px var(--red),
-    0 0 34px rgba(255, 43, 80, 0.5);
+  box-shadow: 0 0 16px var(--red), 0 0 34px rgba(255, 43, 80, 0.5);
   animation: blink 0.95s steps(1) infinite;
 }
-@keyframes blink {
-  50% {
-    opacity: 0.18;
-  }
-}
 
-/* ---------- REFF: tipografi besar + glitch ---------- */
+/* Reff: tipografi besar + glitch */
 .line.reff {
   font-family: var(--display);
   font-size: clamp(20px, 3.05vw, 40px);
@@ -409,35 +305,15 @@ body.is-reff #tilt {
   line-height: 1.28;
   margin: 0.45em 0;
 }
-.line.reff .c-plain {
-  color: #fff3f4;
-}
-.line.reff .c-str {
-  color: var(--red-soft);
-}
-.line.reff .c-fn {
-  color: var(--cyan);
-}
-.line.reff .c-key {
-  color: var(--gold);
-}
-.line.reff .c-kw {
-  color: var(--red);
-}
+.line.reff .c-plain { color: #fff3f4; }
+.line.reff .c-str { color: var(--red-soft); }
+.line.reff .c-fn { color: var(--cyan); }
+.line.reff .c-key { color: var(--gold); }
+.line.reff .c-kw { color: var(--red); }
 .line.reff.is-active {
   text-shadow: 0 0 22px rgba(255, 43, 80, 0.45);
   animation: reffPulse 1.15s ease-in-out infinite;
 }
-@keyframes reffPulse {
-  0%,
-  100% {
-    letter-spacing: -0.02em;
-  }
-  50% {
-    letter-spacing: 0.005em;
-  }
-}
-
 .line.reff::after {
   content: attr(data-text);
   position: absolute;
@@ -452,38 +328,9 @@ body.is-reff #tilt {
 .line.reff.is-active::after {
   animation: glitch 2.8s steps(1) infinite;
 }
-@keyframes glitch {
-  0%,
-  86%,
-  100% {
-    opacity: 0;
-    clip-path: inset(0 0 100% 0);
-    transform: none;
-  }
-  87% {
-    opacity: 0.75;
-    clip-path: inset(6% 0 76% 0);
-    transform: translateX(-5px);
-  }
-  89% {
-    opacity: 0.6;
-    clip-path: inset(64% 0 14% 0);
-    transform: translateX(6px);
-  }
-  91% {
-    opacity: 0.8;
-    clip-path: inset(34% 0 46% 0);
-    transform: translateX(-3px);
-  }
-  93% {
-    opacity: 0;
-  }
-}
 
-/* ---------- SUASANA SEDIH ----------
-   Hanya mengubah latar. Tipografi lirik tidak disentuh.
-   ----------------------------------- */
-
+/* --------------------------------------------------------------------- 5 */
+/* Suasana sedih — hanya latar                                              */
 body[data-mood="sad"] #mood {
   opacity: 1;
 }
@@ -495,7 +342,6 @@ body[data-mood="sad"] #mood::after {
   opacity: 1;
   animation: tearFall 8s linear infinite;
 }
-
 body[data-mood="sad"] #aurora {
   animation: sadAurora 10s ease-in-out infinite alternate;
 }
@@ -508,6 +354,9 @@ body[data-mood="sad"] #scan {
 body[data-mood="sad"] #noise {
   opacity: 0.11;
 }
+body[data-mood="sad"] #viz {
+  opacity: calc(0.5 + var(--energy) * 0.25);
+}
 body[data-mood="sad"] #heart {
   width: min(88vmin, 900px);
   border-color: rgba(180, 130, 190, 0.65);
@@ -517,86 +366,8 @@ body[data-mood="sad"].is-reff #heart {
   animation-duration: 2.4s;
 }
 
-@keyframes moodDrift {
-  from {
-    transform: translate3d(-3%, 0, 0) scale(1);
-  }
-  to {
-    transform: translate3d(4%, -2%, 0) scale(1.12);
-  }
-}
-@keyframes tearFall {
-  from {
-    transform: translateY(-30%);
-  }
-  to {
-    transform: translateY(30%);
-  }
-}
-@keyframes sadAurora {
-  from {
-    transform: scale(1) translate3d(-2%, 1%, 0);
-    filter: saturate(0.7);
-  }
-  to {
-    transform: scale(1.16) translate3d(2%, -3%, 0);
-    filter: saturate(1.15);
-  }
-}
-
-/* ---------- HUD & INTRO ---------- */
-#hud {
-  position: fixed;
-  inset: 0;
-  z-index: 6;
-  pointer-events: none;
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  color: rgba(236, 232, 226, 0.5);
-}
-.hud-top {
-  position: absolute;
-  top: calc(20px + var(--safe-t));
-  left: 22px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.hud-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--red);
-  box-shadow: 0 0 12px var(--red);
-  animation: blink 1.4s steps(1) infinite;
-}
-.hud-mode {
-  color: var(--red-soft);
-  opacity: calc(0.55 + var(--energy) * 0.45);
-}
-.hud-bottom {
-  position: absolute;
-  left: 22px;
-  right: 22px;
-  bottom: calc(18px + var(--safe-b));
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-variant-numeric: tabular-nums;
-}
-.hud-track {
-  position: relative;
-  flex: 1;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.12);
-}
-#hudFill {
-  width: 0%;
-  height: 100%;
-  background: linear-gradient(90deg, var(--red), var(--acid));
-  box-shadow: 0 0 12px var(--red);
-}
-
+/* --------------------------------------------------------------------- 6 */
+/* Intro & status                                                           */
 #intro {
   position: fixed;
   inset: 0;
@@ -634,20 +405,35 @@ body.intro-done #intro {
   color: var(--dim);
   animation: introReveal 1.2s ease 0.35s both;
 }
-@keyframes introReveal {
-  from {
-    opacity: 0;
-    filter: blur(14px);
-    transform: translateY(0.3em) scaleY(1.4);
-  }
-  to {
-    opacity: 1;
-    filter: none;
-    transform: none;
-  }
+
+#hud {
+  position: fixed;
+  z-index: 7;
+  top: calc(20px + var(--safe-t));
+  left: 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: rgba(236, 232, 226, 0.5);
+  pointer-events: none;
+}
+.hud-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 12px var(--red);
+  animation: blink 1.4s steps(1) infinite;
+}
+.hud-mode {
+  color: var(--red-soft);
+  opacity: calc(0.55 + var(--energy) * 0.45);
 }
 
-/* ---------- TOMBOL EDIT (pojok kanan atas) ---------- */
+/* --------------------------------------------------------------------- 7 */
+/* Kontrol                                                                  */
 .ghost-btn {
   position: fixed;
   z-index: 7;
@@ -686,8 +472,8 @@ body.intro-done #intro {
   width: 3px;
   height: 100%;
   background: var(--red);
-  transform-origin: bottom;
   transform: scaleY(0.14);
+  transform-origin: bottom;
 }
 body.is-playing .eq {
   opacity: 1;
@@ -695,31 +481,12 @@ body.is-playing .eq {
 body.is-playing .eq i {
   animation: eq 0.9s ease-in-out infinite alternate;
 }
-.eq i:nth-child(2) {
-  animation-delay: -0.7s !important;
-}
-.eq i:nth-child(3) {
-  animation-delay: -0.35s !important;
-}
-.eq i:nth-child(4) {
-  animation-delay: -0.15s !important;
-}
-.eq i:nth-child(5) {
-  animation-delay: -0.55s !important;
-}
-.eq i:nth-child(6) {
-  animation-delay: -0.25s !important;
-}
-@keyframes eq {
-  from {
-    transform: scaleY(0.12);
-  }
-  to {
-    transform: scaleY(1);
-  }
-}
+.eq i:nth-child(2) { animation-delay: -0.7s !important; }
+.eq i:nth-child(3) { animation-delay: -0.35s !important; }
+.eq i:nth-child(4) { animation-delay: -0.15s !important; }
+.eq i:nth-child(5) { animation-delay: -0.55s !important; }
+.eq i:nth-child(6) { animation-delay: -0.25s !important; }
 
-/* ---------- KONSOL EDIT ---------- */
 #console {
   position: fixed;
   z-index: 12;
@@ -730,8 +497,8 @@ body.is-playing .eq i {
   padding: 18px 16px calc(18px + var(--safe-b));
   background: rgba(12, 12, 16, 0.97);
   border-top: 1px solid #34343d;
-  cursor: auto;
   box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.6);
+  cursor: auto;
 }
 #console.open {
   display: block;
@@ -780,12 +547,12 @@ body.is-playing .eq i {
   font: inherit;
   font-size: 11px;
   letter-spacing: 0.08em;
+  border: 1px solid #3a3a44;
   border-radius: 8px;
   padding: 9px 14px;
-  cursor: pointer;
-  border: 1px solid #3a3a44;
   background: transparent;
   color: var(--fg);
+  cursor: pointer;
 }
 .console-actions button.primary {
   background: var(--red);
@@ -793,7 +560,6 @@ body.is-playing .eq i {
   color: #fff;
 }
 
-/* ---------- TOAST ---------- */
 #toast {
   position: fixed;
   z-index: 20;
@@ -807,9 +573,7 @@ body.is-playing .eq i {
   font-size: 11px;
   letter-spacing: 0.06em;
   opacity: 0;
-  transition:
-    opacity 0.25s,
-    transform 0.25s;
+  transition: opacity 0.25s, transform 0.25s;
   pointer-events: none;
 }
 #toast.show {
@@ -817,28 +581,103 @@ body.is-playing .eq i {
   transform: translate(-50%, 0);
 }
 
+/* --------------------------------------------------------------------- 8 */
+/* Keyframes                                                                */
+@keyframes breathe {
+  from { transform: scale(1) translate3d(0, 0, 0); filter: saturate(1); }
+  to { transform: scale(1.12) translate3d(2%, -2%, 0); filter: saturate(1.5); }
+}
+@keyframes grain {
+  0% { background-position: 0 0; }
+  33% { background-position: -40px 25px; }
+  66% { background-position: 30px -35px; }
+  100% { background-position: 0 0; }
+}
+@keyframes heartbeat {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0.55; }
+  38% { transform: translate(-50%, -50%) scale(1); opacity: 0.14; }
+  100% { transform: translate(-50%, -50%) scale(1.28); opacity: 0; }
+}
+@keyframes dolly {
+  from { transform: translateZ(-170px); }
+  to { transform: translateZ(150px); }
+}
+@keyframes sway {
+  from { transform: rotateX(5deg) rotateY(-12deg) rotateZ(-1deg); }
+  to { transform: rotateX(9deg) rotateY(-3deg) rotateZ(1deg); }
+}
+@keyframes charLand {
+  0% {
+    opacity: 0;
+    transform: translateY(0.62em) rotateX(-78deg) scale(1.35);
+    filter: blur(8px);
+  }
+  55% { opacity: 1; filter: blur(0); }
+  100% { opacity: 1; transform: none; filter: none; }
+}
+@keyframes blink {
+  50% { opacity: 0.18; }
+}
+@keyframes reffPulse {
+  0%, 100% { letter-spacing: -0.02em; }
+  50% { letter-spacing: 0.005em; }
+}
+@keyframes glitch {
+  0%, 86%, 100% {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+    transform: none;
+  }
+  87% {
+    opacity: 0.75;
+    clip-path: inset(6% 0 76% 0);
+    transform: translateX(-5px);
+  }
+  89% {
+    opacity: 0.6;
+    clip-path: inset(64% 0 14% 0);
+    transform: translateX(6px);
+  }
+  91% {
+    opacity: 0.8;
+    clip-path: inset(34% 0 46% 0);
+    transform: translateX(-3px);
+  }
+  93% { opacity: 0; }
+}
+@keyframes moodDrift {
+  from { transform: translate3d(-3%, 0, 0) scale(1); }
+  to { transform: translate3d(4%, -2%, 0) scale(1.12); }
+}
+@keyframes tearFall {
+  from { transform: translateY(-30%); }
+  to { transform: translateY(30%); }
+}
+@keyframes sadAurora {
+  from { transform: scale(1) translate3d(-2%, 1%, 0); filter: saturate(0.7); }
+  to { transform: scale(1.16) translate3d(2%, -3%, 0); filter: saturate(1.15); }
+}
+@keyframes eq {
+  from { transform: scaleY(0.12); }
+  to { transform: scaleY(1); }
+}
+@keyframes introReveal {
+  from {
+    opacity: 0;
+    filter: blur(14px);
+    transform: translateY(0.3em) scaleY(1.4);
+  }
+  to { opacity: 1; filter: none; transform: none; }
+}
+
+/* --------------------------------------------------------------------- 9 */
+/* Responsif & aksesibilitas                                                */
 @media (max-width: 700px) {
-  #lens {
-    width: 92vw;
-  }
-  #field {
-    padding: 15vh 0 22vh;
-  }
-  .console-head span {
-    display: none;
-  }
-  .eq {
-    top: 58px;
-    right: 16px;
-  }
-  .hud-top {
-    left: 14px;
-    font-size: 9px;
-  }
-  .hud-bottom {
-    left: 14px;
-    right: 14px;
-  }
+  #lens { width: 92vw; }
+  #field { padding: 15vh 0 22vh; }
+  .console-head span { display: none; }
+  .eq { top: 58px; right: 16px; }
+  #hud { left: 14px; font-size: 9px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -858,21 +697,9 @@ body.is-playing .eq i {
   .hud-dot {
     animation: none !important;
   }
-  #viz {
-    opacity: 0.3;
-  }
-  #camera {
-    transform: none !important;
-  }
-  .ch.on {
-    opacity: 1;
-    transform: none;
-    filter: none;
-  }
-  #dolly {
-    transform: none;
-  }
-  #tilt {
-    transform: rotateX(4deg) rotateY(-6deg);
-  }
+  #viz { opacity: 0.3; }
+  #camera { transform: none !important; }
+  .ch.on { opacity: 1; transform: none; filter: none; }
+  #dolly { transform: none; }
+  #tilt { transform: rotateX(4deg) rotateY(-6deg); }
 }

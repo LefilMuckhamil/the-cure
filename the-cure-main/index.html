@@ -12,6 +12,7 @@
   </head>
 
   <body>
+    <!-- Latar dan efek -->
     <div id="aurora"></div>
     <div id="grid"></div>
     <canvas id="viz"></canvas>
@@ -19,6 +20,7 @@
     <div id="scan"></div>
     <div id="heart"></div>
 
+    <!-- Panggung lirik 3D -->
     <div id="signal">
       <div id="camera">
         <div id="dolly">
@@ -32,23 +34,17 @@
     <div id="vignette"></div>
     <div id="mood"></div>
 
-    <div id="hud" aria-hidden="true">
-      <div class="hud-top">
-        <span class="hud-dot"></span>
-        <span>THE CURE</span>
-        <span class="hud-mode" id="hudMode">SIGNAL</span>
-      </div>
-      <div class="hud-bottom">
-        <span id="hudTime">00:00</span>
-        <div class="hud-track"><div id="hudFill"></div></div>
-        <span id="hudTotal">01:17</span>
-      </div>
-    </div>
-
+    <!-- Intro dan status -->
     <div id="intro" aria-hidden="true">
       <div class="intro-word">THE</div>
       <div class="intro-word">CURE</div>
-      <div class="intro-sub">LYRIC.SYSTEM</div>
+      <div class="intro-sub">LYRIC.SYSTEM // 77.27</div>
+    </div>
+
+    <div id="hud" aria-hidden="true">
+      <span class="hud-dot"></span>
+      <span>THE CURE // LYRIC.SYSTEM</span>
+      <span class="hud-mode" id="hudMode">SIGNAL</span>
     </div>
 
     <button class="ghost-btn" id="edit">✎ LIRIK</button>
@@ -57,6 +53,7 @@
       <i></i><i></i><i></i><i></i><i></i><i></i>
     </div>
 
+    <!-- Editor lirik -->
     <section id="console">
       <div class="console-head">
         <b>// EDITOR LIRIK</b>
