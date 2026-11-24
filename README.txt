@@ -73,9 +73,10 @@ ANIMASI GRAFIS
 
 Selain tipografi, tampilan memakai Web Audio API untuk mengubah suara jadi
 visual: partikel, spectrum melingkar, waveform, dan riak mengikuti beat.
-Kamera 3D (dolly + goyangan halus) dan pergerakan lirik di-smooth supaya
-transisi antar baris terasa sinematik. Saat mood "sad", palet visual
-berubah ke ungu/biru.
+Lirik muncul sebagai sapuan kiri ke kanan; caret dan kamera mengikuti
+posisi sapuan tersebut. Kamera 3D (dolly + goyangan halus) dan pergerakan
+lirik di-smooth supaya transisi antar baris terasa sinematik. Saat mood
+"sad", palet visual berubah ke ungu/biru.
 
 Semua efek otomatis melemah bila sistem memakai prefers-reduced-motion.
 

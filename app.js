@@ -23,8 +23,9 @@
     beatWindow: 43,
     beatThreshold: 1.28,
     minBeatGap: 280,
-    cameraTau: 170,
-    lensTau: 300,
+    cameraTau: 220,
+    lensTau: 420,
+    focusTau: 360,
   };
 
   /* ------------------------------------------------------------------ 2. */
@@ -75,6 +76,8 @@
 
     cam: { x: 0, y: 0, tx: 0, ty: 0 },
     lens: { x: 0, y: 0, tx: 0, ty: 0 },
+    focus: 0,
+    focusTarget: 0,
     particles: [],
     ripples: [],
   };
@@ -235,6 +238,8 @@
     draw(now, dt) {
       const w = window.innerWidth;
       const h = window.innerHeight;
+      const centerX = w * 0.5 + state.focus * w * 0.045;
+      const centerY = h * 0.46;
       const colors = this.palette();
 
       ctx.clearRect(0, 0, w, h);
@@ -242,8 +247,6 @@
 
       // Spectrum melingkar
       if (sound.freq && !dom.audio.paused) {
-        const cx = w * 0.5;
-        const cy = h * 0.46;
         const radius = Math.min(w, h) * 0.24 * (1 + state.beat * 0.035);
         ctx.lineWidth = 1.4;
 
@@ -253,14 +256,14 @@
           if (level < 0.06) continue;
           const angle = (i / 96) * Math.PI * 2 + now * 0.00007;
           const length = 6 + level * Math.min(w, h) * 0.15;
-          const x = cx + Math.cos(angle) * radius;
-          const y = cy + Math.sin(angle) * radius;
+          const x = centerX + Math.cos(angle) * radius;
+          const y = centerY + Math.sin(angle) * radius;
           ctx.strokeStyle = `rgba(${colors[i % 3]},${(0.1 + level * 0.55).toFixed(3)})`;
           ctx.beginPath();
           ctx.moveTo(x, y);
           ctx.lineTo(
-            cx + Math.cos(angle) * (radius + length),
-            cy + Math.sin(angle) * (radius + length),
+            centerX + Math.cos(angle) * (radius + length),
+            centerY + Math.sin(angle) * (radius + length),
           );
           ctx.stroke();
         }
@@ -276,7 +279,7 @@
           continue;
         }
         ctx.beginPath();
-        ctx.arc(w / 2, h * 0.46, ripple.r, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY, ripple.r, 0, Math.PI * 2);
         ctx.strokeStyle = `rgba(${colors[0]},${(ripple.a * 0.28).toFixed(3)})`;
         ctx.lineWidth = 1;
         ctx.stroke();
@@ -322,17 +325,22 @@
     camera(now, dt) {
       if (state.reduced) return;
       const t = 1 - Math.exp(-dt / CONFIG.cameraTau);
+      const focusT = 1 - Math.exp(-dt / CONFIG.focusTau);
       const cam = state.cam;
-      cam.tx = Math.sin(now * 0.00021) * 9 + (Math.random() - 0.5) * state.beat * 16;
-      cam.ty = Math.cos(now * 0.00017) * 6 + state.beat * 8;
+      state.focus = lerp(state.focus, state.focusTarget, focusT);
+
+      cam.tx = Math.sin(now * 0.00021) * 8 + state.beat * 10 - state.focus * 10;
+      cam.ty = Math.cos(now * 0.00017) * 5 + state.beat * 7;
       cam.x = lerp(cam.x, cam.tx, t);
       cam.y = lerp(cam.y, cam.ty, t);
 
-      const z = state.beat * 34 + state.bass * 20;
-      const rz = Math.sin(now * 0.00013) * 0.5 + state.beat * 0.22;
+      const z = state.beat * 30 + state.bass * 18;
+      const ry = -state.focus * 4;
+      const rz = Math.sin(now * 0.00013) * 0.4 + state.beat * 0.18;
       dom.camera.style.transform =
         `translate3d(${cam.x.toFixed(2)}px,${cam.y.toFixed(2)}px,${z.toFixed(1)}px) ` +
-        `rotateZ(${rz.toFixed(3)}deg) scale(${(1 + state.beat * 0.012).toFixed(4)})`;
+        `rotateY(${ry.toFixed(2)}deg) rotateZ(${rz.toFixed(3)}deg) ` +
+        `scale(${(1 + state.beat * 0.01).toFixed(4)})`;
     },
 
     lens(dt) {
@@ -493,10 +501,12 @@
       line.offsetTop +
       (hasCursor ? cursor.offsetTop + cursor.offsetHeight / 2 : line.offsetHeight / 2);
 
-    state.lens.tx = hasCursor
-      ? -(cursor.offsetLeft - dom.lens.clientWidth * 0.5) * 0.22
-      : 0;
+    const center = dom.lens.clientWidth * 0.5;
+    state.lens.tx = hasCursor ? -(cursor.offsetLeft - center) * 0.6 : 0;
     state.lens.ty = -(y + line.offsetHeight / 2);
+    state.focusTarget = hasCursor
+      ? clamp((cursor.offsetLeft - center) / center, -1, 1)
+      : 0;
   }
 
   function updateMode() {

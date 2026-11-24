@@ -266,7 +266,7 @@ body.is-reff #tilt {
 }
 .ch.on {
   display: inline-block;
-  animation: charLand 0.46s cubic-bezier(0.18, 0.9, 0.28, 1.25) both;
+  animation: charSweep 0.42s cubic-bezier(0.25, 0.8, 0.25, 1) both;
 }
 
 .c-plain { color: var(--fg); }
@@ -287,13 +287,13 @@ body.is-reff #tilt {
 
 .cur {
   display: inline-block;
-  width: 0.5em;
-  height: 1.02em;
+  width: 2px;
+  height: 1.12em;
   margin-left: 3px;
   background: var(--red);
-  vertical-align: -0.15em;
-  box-shadow: 0 0 16px var(--red), 0 0 34px rgba(255, 43, 80, 0.5);
-  animation: blink 0.95s steps(1) infinite;
+  vertical-align: -0.18em;
+  box-shadow: 0 0 14px var(--red), 0 0 32px rgba(255, 43, 80, 0.5);
+  animation: caretPulse 1.3s ease-in-out infinite;
 }
 
 /* Reff: tipografi besar + glitch */
@@ -606,17 +606,27 @@ body.is-playing .eq i {
   from { transform: rotateX(5deg) rotateY(-12deg) rotateZ(-1deg); }
   to { transform: rotateX(9deg) rotateY(-3deg) rotateZ(1deg); }
 }
-@keyframes charLand {
+@keyframes charSweep {
   0% {
     opacity: 0;
-    transform: translateY(0.62em) rotateX(-78deg) scale(1.35);
-    filter: blur(8px);
+    transform: translateX(-0.32em) scaleX(0.88);
+    filter: blur(3px);
+    text-shadow: 0 0 14px var(--red-soft);
   }
-  55% { opacity: 1; filter: blur(0); }
-  100% { opacity: 1; transform: none; filter: none; }
+  60% { opacity: 1; filter: blur(0); }
+  100% {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    text-shadow: none;
+  }
 }
 @keyframes blink {
   50% { opacity: 0.18; }
+}
+@keyframes caretPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
 }
 @keyframes reffPulse {
   0%, 100% { letter-spacing: -0.02em; }
@@ -629,19 +639,19 @@ body.is-playing .eq i {
     transform: none;
   }
   87% {
-    opacity: 0.75;
+    opacity: 0.45;
     clip-path: inset(6% 0 76% 0);
-    transform: translateX(-5px);
+    transform: translateX(-3px);
   }
   89% {
-    opacity: 0.6;
+    opacity: 0.35;
     clip-path: inset(64% 0 14% 0);
-    transform: translateX(6px);
+    transform: translateX(4px);
   }
   91% {
-    opacity: 0.8;
+    opacity: 0.5;
     clip-path: inset(34% 0 46% 0);
-    transform: translateX(-3px);
+    transform: translateX(-2px);
   }
   93% { opacity: 0; }
 }
@@ -694,7 +704,8 @@ body.is-playing .eq i {
   body[data-mood="sad"] #mood::after,
   .intro-word,
   .intro-sub,
-  .hud-dot {
+  .hud-dot,
+  .cur {
     animation: none !important;
   }
   #viz { opacity: 0.3; }
