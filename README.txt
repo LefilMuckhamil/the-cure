@@ -7,9 +7,7 @@ CARA MENJALANKAN
 Windows: klik dua kali start.bat.
 
 Cara lain:
-  - python start.py
-  - buka index.html langsung di browser
-  - pakai server statis lain (Live Server, http-server, dll.)
+ 
 
 start.bat menjalankan start.py, menyalakan server di port 8000 (kalau
 sudah dipakai, cari port kosong berikutnya), lalu membuka browser.
